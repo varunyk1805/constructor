@@ -118,6 +118,7 @@ const handlleSubmit = event => {
     blocks.push({ imageURL, title, text, link });
     
     if (blocks.length > countMaxBlocksInPage) {
+        loadMoreBtn.classList.remove('is-none');
         return;
     };
     
