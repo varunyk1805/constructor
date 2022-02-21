@@ -39,7 +39,7 @@ const handlleTitleInput = () => {
         titleError.textContent = 'Поле ввода не может быть пустым';
         return false;
     };
-    if (!titleInput.value.match(/^[А-Яа-яЁё\s]+$/)) {
+    if (!titleInput.value.match(/^[А-Яа-яЁёІіЇїЄєҐґ\s]+$/)) {
         titleError.textContent = 'Только кириллические символы';
         titleError.classList.add('active');
         return false;
@@ -66,7 +66,7 @@ const handlletextarea = () => {
         textareaError.textContent = 'Поле ввода не может быть пустым';
         return false;
     };
-    if (!textarea.value.match(/^[А-Яа-яЁё\s]+$/)) {
+    if (!textarea.value.match(/^[А-Яа-яЁёІіЇїЄєҐґ\s]+$/)) {
         textareaError.textContent = 'Только кириллические символы';
         textareaError.classList.add('active');
         return false;
