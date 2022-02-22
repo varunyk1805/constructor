@@ -12,23 +12,23 @@
         <label class="label-image">
             <div class="thumb"></div>
             Выберите картинку
-            <input type="file" class="visually-hidden" id="input-image" accept="image/png, image/jpeg">
+            <input type="file" class="input visually-hidden" data-input="image" accept="image/png, image/jpeg">
             <span id="error-image" class="error error-image" aria-live="polite"></span>
         </label>
         <div class="input-box"> 
             <label class="label">
                 Заголовок
-                <input type="text" class="input" id="input-title" maxlength="20" placeholder="Введите название ресурса (до 20 символов)">
+                <input type="text" class="input" data-input="title" maxlength="20" placeholder="Введите название ресурса (до 20 символов)">
                 <span id="error-title" class="error" aria-live="polite"></span>
             </label>
             <label class="label">
                 Ссылка
-                <input type="text" class="input" id="input-link" placeholder="Введите ссылку на ресурс">
+                <input type="text" class="input" data-input="link" placeholder="Введите ссылку на ресурс">
                 <span id="error-link" class="error" aria-live="polite"></span>
             </label>
             <label class="label-textarea">
                 Текст
-                <textarea class="textarea" id="textarea" maxlength="250" rows="6" placeholder="Введите описание ресурса (до 250 символов)"></textarea>
+                <textarea class="textarea input" data-input="text" maxlength="250" rows="6" placeholder="Введите описание ресурса (до 250 символов)"></textarea>
                 <span id="error-textarea" class="error" aria-live="polite"></span>
             </label>
             <button class="submit" type="submit">Создать</button>
