@@ -1,7 +1,7 @@
 const form = document.querySelector('.form');
 const inputs = document.querySelectorAll('.input');
-const imageError = document.querySelector('.error');
 const imageThumb = document.querySelector('.thumb');
+const imageError = document.querySelector('#error-image');
 const titleError = document.querySelector('#error-title');
 const linkError = document.querySelector('#error-link');
 const textareaError = document.querySelector('#error-textarea');
@@ -50,7 +50,7 @@ const handlleValidationInput = input => {
         case 'image':
             if (!input.value) {
                 imageError.textContent = 'Нужно выбрать изображения следующих форматов: .png, .jpeg';
-                return;
+                return false;
             };
 
             file = input.files[0];
@@ -58,64 +58,76 @@ const handlleValidationInput = input => {
                 imageError.textContent = 'Разрешено выбрать изображения следующих форматов: .png, .jpeg';
                 imageError.classList.add('active');
                 imageThumb.innerHTML = '';
-                return;
+                return false;
             };
         
             imageError.textContent = '';
             imageError.classList.remove('active');
             renderImageInForm();
-            break;
+            return true;
         
         case 'title':
             if (!input.value) {
                 titleError.textContent = 'Поле ввода не может быть пустым';
-                return;
+                return false;
             };
             if (!input.value.match(/^[А-Яа-яЁёІіЇїЄєҐґ\s]+$/)) {
                 titleError.textContent = 'Только кириллические символы';
                 titleError.classList.add('active');
-                return;
+                return false;
             };
             titleValue = input.value;
             titleError.textContent = '';
             titleError.classList.remove('active');
-            break;
+            return true;
             
         case 'link':
             if (!input.value) {
                 linkError.textContent = 'Поле ввода не может быть пустым';
-                return;
+                return false;
             };
                 
             linkValue = input.value;
             linkError.textContent = '';
             linkError.classList.remove('active');
-            break;
+            return true;
             
         case 'text':
             if (!input.value) {
                 textareaError.textContent = 'Поле ввода не может быть пустым';
-                return;
+                return false;
             };
             if (!input.value.match(/^[А-Яа-яЁёІіЇїЄєҐґ\s]+$/)) {
                 textareaError.textContent = 'Только кириллические символы';
                 textareaError.classList.add('active');
-                return;
+                return false;
             };
             textValue = input.value;
             textareaError.textContent = '';
             textareaError.classList.remove('active');
-            break;
+            return true;
         
         default:
-            return;
+            return false;
     };
+};
+
+const validationFormCheck = () => {
+    let countValidatedInput = 0;
+    inputs.forEach(input => {
+        if (handlleValidationInput(input)) {
+            countValidatedInput += 1;
+        };
+        return;
+    });
+    if (countValidatedInput === inputs.length) return true;
+    return false;
 };
 
 const handlleSubmit = event => {
     event.preventDefault();
 
-    inputs.forEach(input =>  handlleValidationInput(input));
+    if (!validationFormCheck()) return;
 
     blocks.push({ imageURL, titleValue, textValue, linkValue });
     
