@@ -84,16 +84,12 @@ const handlleSubmit = event => {
     textValue = textarea.value;
     
     blocks.push({ imageURL, titleValue, textValue, linkValue });
-
-    imageThumb.innerHTML = '';
-    form.reset();
     
     if (blocks.length > countMaxBlocksInPage) {
         loadMoreBtn.classList.remove('is-none');
         return;
     };
 
-    preloader.classList.remove('is-none');
     const markup = `
         <div class="block">
             <a href="${linkValue}">
@@ -102,9 +98,14 @@ const handlleSubmit = event => {
                 <p>${textValue}</p>
             </a>
         </div>
-    `;   
-    preloader.classList.add('is-none');
+    `;  
+    
+    imageThumb.innerHTML = '';
+    form.reset();
+
+    preloader.classList.remove('is-none');
     box.insertAdjacentHTML('beforeend', markup);
+    preloader.classList.add('is-none');
 };
 
 const handlleLoadMore = () => {
@@ -113,7 +114,6 @@ const handlleLoadMore = () => {
     countMaxBlocksInPage = PER_PAGE * page;
     const end = Math.min(blocks.length, countMaxBlocksInPage);
     
-    preloader.classList.remove('is-none');
     const markup = blocks.slice(start, end).map(block => {
         const { imageURL, titleValue, textValue, linkValue } = block;
 
@@ -127,8 +127,10 @@ const handlleLoadMore = () => {
             </div>
         `;
     }).join('');
-    preloader.classList.add('is-none');
+
+    preloader.classList.remove('is-none');
     box.insertAdjacentHTML('beforeend', markup);
+    preloader.classList.add('is-none');
 
     if (blocks.length > countMaxBlocksInPage) return;
     loadMoreBtn.classList.add('is-none');
