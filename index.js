@@ -33,6 +33,25 @@ const renderImageInForm = () => {
     imageThumb.innerHTML = `<img src="${imageURL}" width="190" />`;
 };
 
+const renderBlocks = blocks => {
+    const markup = blocks.map(block => {
+        const { imageURL, titleValue, textValue, linkValue } = block;
+        return `
+            <div class="block">
+                <a href="${linkValue}">
+                    <img src="${imageURL}" alt="${titleValue}" />
+                    <p>${titleValue}</p>
+                    <p>${textValue}</p>
+                </a>
+            </div>
+        `;
+    }).join('');
+    
+    preloader.classList.remove('is-none');
+    box.insertAdjacentHTML('beforeend', markup);
+    preloader.classList.add('is-none');
+};
+
 const handlleValidationInput = input => {
     switch (input.id) {
         case 'input-image':
@@ -110,25 +129,14 @@ const handlleSubmit = event => {
     
     imageThumb.innerHTML = '';
     form.reset();
-
+    
     if (blocks.length > countMaxBlocksInPage) {
         loadMoreBtn.classList.remove('is-none');
         return;
     };
 
-    const markup = `
-        <div class="block">
-            <a href="${linkValue}">
-                <img src="${imageURL}" alt="${titleValue}" />
-                <p>${titleValue}</p>
-                <p>${textValue}</p>
-            </a>
-        </div>
-    `;  
-    
-    preloader.classList.remove('is-none');
-    box.insertAdjacentHTML('beforeend', markup);
-    preloader.classList.add('is-none');
+    const lastBlock = blocks[blocks.length - 1];
+    renderBlocks([lastBlock]);
 };
 
 const handlleLoadMore = () => {
@@ -136,24 +144,9 @@ const handlleLoadMore = () => {
     page += 1;
     countMaxBlocksInPage = PER_PAGE * page;
     const end = Math.min(blocks.length, countMaxBlocksInPage);
-    
-    const markup = blocks.slice(start, end).map(block => {
-        const { imageURL, titleValue, textValue, linkValue } = block;
+    const blocksForRender = blocks.slice(start, end);
 
-        return `
-            <div class="block">
-                <a href="${linkValue}">
-                    <img src="${imageURL}" alt="${titleValue}" />
-                    <p>${titleValue}</p>
-                    <p>${textValue}</p>
-                </a>
-            </div>
-        `;
-    }).join('');
-
-    preloader.classList.remove('is-none');
-    box.insertAdjacentHTML('beforeend', markup);
-    preloader.classList.add('is-none');
+    renderBlocks(blocksForRender);
 
     if (blocks.length > countMaxBlocksInPage) return;
     loadMoreBtn.classList.add('is-none');
