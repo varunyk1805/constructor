@@ -1,6 +1,7 @@
+const form = document.querySelector('.form');
 const imageInput = document.querySelector('#input-image');
 const imageError = document.querySelector('.error');
-const ImageThumb = document.querySelector('.thumb');
+const imageThumb = document.querySelector('.thumb');
 const titleInput = document.querySelector('#input-title');
 const titleError = document.querySelector('#error-title');
 const linkInput = document.querySelector('#input-link');
@@ -17,167 +18,128 @@ const blocks = [];
 let page = 1;
 let countMaxBlocksInPage = PER_PAGE * page;
 
-const handlleImageInput = () => {
-    const fileType = imageInput.files[0].type;
-    if (fileType !== 'image/png' && fileType !== 'image/jpeg') {
-        ImageThumb.innerHTML = ``;
-        imageError.textContent = 'Разрешено выбрать изображения следующих форматов: .png, .jpeg';
-        imageError.classList.add('active');
-        return false;
+let imageURL;
+let titleValue;
+let linkValue;
+let textValue;
+
+const renderImageInForm = () => {
+    const file = imageInput.files[0];
+    if (file.type !== 'image/png' && file.type !== 'image/jpeg') {
+        imageThumb.innerHTML = '';
+        return;
+    };
+    imageURL = window.URL.createObjectURL(file);
+    imageThumb.innerHTML = `<img src="${imageURL}" width="190" />`;
+};
+
+const handlleValidationInput = (input, error) => {
+    
+    if (input.id === 'input-image') {
+        if (!imageInput.value) {
+            error.textContent = 'Нужно выбрать изображения следующих форматов: .png, .jpeg';
+            return false;
+        };
+
+        const file = imageInput.files[0];
+        if (file.type !== 'image/png' && file.type !== 'image/jpeg') {
+            error.textContent = 'Разрешено выбрать изображения следующих форматов: .png, .jpeg';
+            error.classList.add('active');
+            return false;
+        };
+    
+        imageError.textContent = '';
+        imageError.classList.remove('active');
+        return true;
     };
     
-    const imageURL = window.URL.createObjectURL(imageInput.files[0]);
-    ImageThumb.innerHTML = `<img src="${imageURL}" width="190" />`;
+    if (input.id === 'input-title' || 'textarea') { 
+        if (!input.value.match(/^[А-Яа-яЁёІіЇїЄєҐґ\s]+$/)) {
+            error.textContent = 'Только кириллические символы';
+            error.classList.add('active');
+            return false;
+        };
+    };
     
-    imageError.textContent = '';
-    imageError.classList.remove('active');
-    return true;
-};
-
-const handlleTitleInput = () => {
-    if (!titleInput.value) {
-        titleError.textContent = 'Поле ввода не может быть пустым';
+    if (!input.value) {
+        error.textContent = 'Поле ввода не может быть пустым';
         return false;
-    };
-    if (!titleInput.value.match(/^[А-Яа-яЁёІіЇїЄєҐґ\s]+$/)) {
-        titleError.textContent = 'Только кириллические символы';
-        titleError.classList.add('active');
-        return false;
-    };
+    }; 
 
-    titleError.textContent = '';
-    titleError.classList.remove('active');
-    return true;
-};
-
-const handlleLinkInput = () => {
-    if (!linkInput.value) {
-        linkError.textContent = 'Поле ввода не может быть пустым';
-        return false;
-    };
-
-    linkError.textContent = '';
-    linkError.classList.remove('active');
-    return true;
-};
-
-const handlletextarea = () => {
-    if (!textarea.value) {
-        textareaError.textContent = 'Поле ввода не может быть пустым';
-        return false;
-    };
-    if (!textarea.value.match(/^[А-Яа-яЁёІіЇїЄєҐґ\s]+$/)) {
-        textareaError.textContent = 'Только кириллические символы';
-        textareaError.classList.add('active');
-        return false;
-    };
-
-    textareaError.textContent = '';
-    textareaError.classList.remove('active');
-    return true;
+    error.textContent = '';
+    error.classList.remove('active');
+    return true;        
 };
 
 const handlleSubmit = event => {
     event.preventDefault();
     
-    const image = imageInput.value;
-    const title = titleInput.value;
-    const link = linkInput.value;
-    const text = textarea.value;
+    if (!handlleValidationInput(imageInput, imageError)) return;
+    if (!handlleValidationInput(titleInput, titleError)) return;
+    if (!handlleValidationInput(linkInput, linkError)) return;
+    if (!handlleValidationInput(textarea, textareaError)) return;
 
-    // ---------------------
-    // Перевірка на пусті поля вводу
-    if (!image) {
-        imageError.textContent = 'Нужно выбрать изображения следующих форматов: .png, .jpeg';
-        return
-    };
-    if (!title) {
-        titleError.textContent = 'Поле ввода не может быть пустым';
-        return;
-    }; 
-    if (!link) {
-        linkError.textContent = 'Поле ввода не может быть пустым';
-        return;
-    };
-    if (!text) {
-        textareaError.textContent = 'Поле ввода не может быть пустым';
-        return;
-    };
-    // ---------------------
+    titleValue = titleInput.value;
+    linkValue = linkInput.value;
+    textValue = textarea.value;
+    
+    blocks.push({ imageURL, titleValue, textValue, linkValue });
 
-    // ---------------------
-    // Перевірка на валідність введених даних в поля вводу
-    if (!handlleImageInput()) return;
-    if (!handlleTitleInput()) return;
-    if (!handlleLinkInput()) return;
-    if (!handlletextarea()) return;
-    // ---------------------
-    
-    const imageURL = window.URL.createObjectURL(imageInput.files[0]);
-    
-    blocks.push({ imageURL, title, text, link });
+    imageThumb.innerHTML = '';
+    form.reset();
     
     if (blocks.length > countMaxBlocksInPage) {
         loadMoreBtn.classList.remove('is-none');
         return;
     };
-    
+
     preloader.classList.remove('is-none');
-    
     const markup = `
         <div class="block">
-            <a href="${link}">
-                <img src="${imageURL}" alt="${title}" />
-                <p>${title}</p>
-                <p>${text}</p>
+            <a href="${linkValue}">
+                <img src="${imageURL}" alt="${titleValue}" />
+                <p>${titleValue}</p>
+                <p>${textValue}</p>
             </a>
         </div>
-    `;
-    
-    // ---------------------
-    // Очистка форми
-    ImageThumb.innerHTML = '';
-    imageInput.value = '';
-    titleInput.value = '';
-    linkInput.value = '';
-    textarea.value = '';
-    // ---------------------
-    
+    `;   
     preloader.classList.add('is-none');
     box.insertAdjacentHTML('beforeend', markup);
 };
 
 const handlleLoadMore = () => {
-    preloader.classList.remove('is-none');
     const start = countMaxBlocksInPage;
     page += 1;
     countMaxBlocksInPage = PER_PAGE * page;
     const end = Math.min(blocks.length, countMaxBlocksInPage);
-
+    
+    preloader.classList.remove('is-none');
     const markup = blocks.slice(start, end).map(block => {
-        const { imageURL, title, text, link } = block;
+        const { imageURL, titleValue, textValue, linkValue } = block;
 
         return `
             <div class="block">
-                <a href="${link}">
-                    <img src="${imageURL}" alt="${title}" />
-                    <p>${title}</p>
-                    <p>${text}</p>
+                <a href="${linkValue}">
+                    <img src="${imageURL}" alt="${titleValue}" />
+                    <p>${titleValue}</p>
+                    <p>${textValue}</p>
                 </a>
             </div>
         `;
     }).join('');
-
     preloader.classList.add('is-none');
     box.insertAdjacentHTML('beforeend', markup);
-    if (blocks.length > countMaxBlocksInPage) return;
 
+    if (blocks.length > countMaxBlocksInPage) return;
     loadMoreBtn.classList.add('is-none');
 };
 
-imageInput.addEventListener('input', handlleImageInput);
-titleInput.addEventListener("input", handlleTitleInput);
-linkInput.addEventListener("input", handlleLinkInput);
-textarea.addEventListener("input", handlletextarea);
+imageInput.addEventListener('input', () => {
+    handlleValidationInput(imageInput, imageError);
+    renderImageInForm();
+});
+titleInput.addEventListener("input", () => handlleValidationInput(titleInput, titleError));
+linkInput.addEventListener("input", () => handlleValidationInput(linkInput, linkError));
+textarea.addEventListener("input", () => handlleValidationInput(textarea, textareaError));
 submitBtn.addEventListener('click', handlleSubmit);
 loadMoreBtn.addEventListener('click', handlleLoadMore);
