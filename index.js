@@ -85,6 +85,9 @@ const handlleSubmit = event => {
     
     blocks.push({ imageURL, titleValue, textValue, linkValue });
     
+    imageThumb.innerHTML = '';
+    form.reset();
+
     if (blocks.length > countMaxBlocksInPage) {
         loadMoreBtn.classList.remove('is-none');
         return;
@@ -100,9 +103,6 @@ const handlleSubmit = event => {
         </div>
     `;  
     
-    imageThumb.innerHTML = '';
-    form.reset();
-
     preloader.classList.remove('is-none');
     box.insertAdjacentHTML('beforeend', markup);
     preloader.classList.add('is-none');
