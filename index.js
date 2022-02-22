@@ -33,42 +33,65 @@ const renderImageInForm = () => {
     imageThumb.innerHTML = `<img src="${imageURL}" width="190" />`;
 };
 
-const handlleValidationInput = (input, error) => {
-    
-    if (input.id === 'input-image') {
-        if (!imageInput.value) {
-            error.textContent = 'Нужно выбрать изображения следующих форматов: .png, .jpeg';
-            return false;
-        };
+const handlleValidationInput = input => {
+    switch (input.id) {
+        case 'input-image':
+            if (!imageInput.value) {
+                imageError.textContent = 'Нужно выбрать изображения следующих форматов: .png, .jpeg';
+                return false;
+            };
 
-        const file = imageInput.files[0];
-        if (file.type !== 'image/png' && file.type !== 'image/jpeg') {
-            error.textContent = 'Разрешено выбрать изображения следующих форматов: .png, .jpeg';
-            error.classList.add('active');
-            return false;
-        };
-    
-        imageError.textContent = '';
-        imageError.classList.remove('active');
-        return true;
-    };
-    
-    if (input.id === 'input-title' || 'textarea') { 
-        if (!input.value.match(/^[А-Яа-яЁёІіЇїЄєҐґ\s]+$/)) {
-            error.textContent = 'Только кириллические символы';
-            error.classList.add('active');
-            return false;
-        };
-    };
-    
-    if (!input.value) {
-        error.textContent = 'Поле ввода не может быть пустым';
-        return false;
-    }; 
+            const file = imageInput.files[0];
+            if (file.type !== 'image/png' && file.type !== 'image/jpeg') {
+                imageError.textContent = 'Разрешено выбрать изображения следующих форматов: .png, .jpeg';
+                imageError.classList.add('active');
+                return false;
+            };
+        
+            imageError.textContent = '';
+            imageError.classList.remove('active');
+            return true;
+        
+        case 'input-title':
+            if (!input.value) {
+                titleError.textContent = 'Поле ввода не может быть пустым';
+                return false;
+            }; 
+            if (!input.value.match(/^[А-Яа-яЁёІіЇїЄєҐґ\s]+$/)) {
+                titleError.textContent = 'Только кириллические символы';
+                titleError.classList.add('active');
+                return false;
+            };
+            titleError.textContent = '';
+            titleError.classList.remove('active');
+            return true;  
+        
+        
+        case 'input-link':
+            if (!input.value) {
+                linkError.textContent = 'Поле ввода не может быть пустым';
+                return false;
+            }; 
 
-    error.textContent = '';
-    error.classList.remove('active');
-    return true;        
+            linkError.textContent = '';
+            linkError.classList.remove('active');
+            return true;  
+        
+        
+        case 'textarea':
+            if (!input.value) {
+                textareaError.textContent = 'Поле ввода не может быть пустым';
+                return false;
+            }; 
+            if (!input.value.match(/^[А-Яа-яЁёІіЇїЄєҐґ\s]+$/)) {
+                textareaError.textContent = 'Только кириллические символы';
+                textareaError.classList.add('active');
+                return false;
+            };
+            textareaError.textContent = '';
+            textareaError.classList.remove('active');
+            return true;  
+    };      
 };
 
 const handlleSubmit = event => {
@@ -137,11 +160,11 @@ const handlleLoadMore = () => {
 };
 
 imageInput.addEventListener('input', () => {
-    handlleValidationInput(imageInput, imageError);
+    handlleValidationInput(imageInput);
     renderImageInForm();
 });
-titleInput.addEventListener("input", () => handlleValidationInput(titleInput, titleError));
-linkInput.addEventListener("input", () => handlleValidationInput(linkInput, linkError));
-textarea.addEventListener("input", () => handlleValidationInput(textarea, textareaError));
+titleInput.addEventListener("input", () => handlleValidationInput(titleInput));
+linkInput.addEventListener("input", () => handlleValidationInput(linkInput));
+textarea.addEventListener("input", () => handlleValidationInput(textarea));
 submitBtn.addEventListener('click', handlleSubmit);
 loadMoreBtn.addEventListener('click', handlleLoadMore);
